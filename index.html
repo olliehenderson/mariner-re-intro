@@ -1,0 +1,479 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mariner Re Walkthrough</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap">
+<style>
+/* Restyled to the Toucanberry Tech report: Space Grotesk, cream ground, dark grey ink, green accents, coral tags. */
+:root {
+  --bg: #FAF8EE; --surface: #FFFFFF; --card: #F0F0ED; --ink: #22312C; --muted: #5F6B66; --line: #E2E3DD; --rule: #22312C;
+  --green: #5FD8A3; --coral: #FD7D6A; --on-accent: #22312C;
+  --btn-bg: #22312C; --btn-ink: #FAF8EE; --glow: 0 8px 24px -6px rgba(95,216,163,.55);
+  --shadow: 0 1px 2px rgba(34,49,44,.04), 0 10px 30px -12px rgba(34,49,44,.14);
+  --chip: #FFFFFF; --chip-ink: #1B2A26;
+  --logo-light-display: block; --logo-dark-display: none;
+  --font: "Space Grotesk", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --ease: cubic-bezier(.22,1,.36,1);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #1B2723; --surface: #24332E; --card: #24332E; --ink: #FAF8EE; --muted: #A9B6B1; --line: #34463F; --rule: #FAF8EE;
+    --btn-bg: #5FD8A3; --btn-ink: #22312C; --glow: 0 8px 24px -8px rgba(95,216,163,.45);
+    --shadow: none; --logo-light-display: none; --logo-dark-display: block; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #1B2723; --surface: #24332E; --card: #24332E; --ink: #FAF8EE; --muted: #A9B6B1; --line: #34463F; --rule: #FAF8EE;
+  --btn-bg: #5FD8A3; --btn-ink: #22312C; --glow: 0 8px 24px -8px rgba(95,216,163,.45);
+  --shadow: none; --logo-light-display: none; --logo-dark-display: block; color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink); font-family: var(--font); font-size: 17px; line-height: 1.6;
+  padding-left: max(24px, env(safe-area-inset-left, 0px));
+  padding-right: max(24px, env(safe-area-inset-right, 0px));
+  padding-block: 24px 64px; min-height: 100vh; -webkit-font-smoothing: antialiased;
+}
+a { color: var(--ink); text-decoration-color: var(--green); text-underline-offset: 3px; }
+a:hover { color: var(--muted); }
+.wrap { max-width: 880px; margin: 0 auto; display: flex; flex-direction: column; gap: 40px; }
+
+/* prototype strip */
+.proto { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; padding: 10px 16px; border: 1px dashed var(--line); border-radius: 12px; font-size: 13px; color: var(--muted); }
+.proto strong { color: var(--ink); font-weight: 700; letter-spacing: .16em; text-transform: uppercase; font-size: 10.5px; }
+.proto input { font: inherit; font-size: 14px; color: var(--ink); background: var(--surface); border: 1.5px solid var(--line); border-radius: 999px; padding: 6px 14px; width: 170px; min-width: 0; }
+.proto input:focus { outline: none; border-color: var(--green); }
+.proto .note { flex: 1 1 220px; min-width: 0; }
+
+/* header */
+.top { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-top: 8px; }
+.brand img { height: 44px; width: auto; max-width: 100%; }
+.brand .l { display: var(--logo-light-display); }
+.brand .d { display: var(--logo-dark-display); }
+.count { font-size: 11px; font-weight: 500; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.bar { display: flex; gap: 6px; margin-top: -16px; }
+.bar button { flex: 1 1 0; min-width: 0; height: 4px; padding: 0; border: 0; border-radius: 999px; background: var(--line); cursor: pointer; transition: background .32s var(--ease); background-clip: content-box; padding-block: 10px; box-sizing: content-box; }
+.bar button[aria-current="step"] { background-color: var(--green); }
+.bar button.done { background-color: var(--ink); }
+.bar button:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; }
+
+/* step */
+main { padding-top: 24px; }
+.step { display: flex; flex-direction: column; gap: 32px; }
+.step[hidden] { display: none; }
+.step[data-id="welcome"] { padding-block: clamp(24px, 6vw, 72px) 8px; gap: 36px; }
+.step[data-id="welcome"]::before { content: ""; width: 56px; height: 4px; border-radius: 999px; background: var(--green); }
+.label { display: inline-block; align-self: flex-start; padding: 5px 12px; border-radius: 999px; background: var(--coral); color: var(--on-accent); font-size: 10.5px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; line-height: 1.4; margin-bottom: -12px; }
+h1, h2 { margin: 0; font-weight: 700; letter-spacing: -.03em; line-height: 1.04; text-wrap: balance; outline: none; }
+h1 { font-size: clamp(38px, 6.6vw, 64px); max-width: 16ch; }
+h2 { font-size: clamp(30px, 4.8vw, 46px); max-width: 20ch; letter-spacing: -.025em; line-height: 1.08; }
+h3 { margin: 0; font-size: 19px; font-weight: 700; letter-spacing: -.02em; line-height: 1.25; }
+p { margin: 0; max-width: 62ch; text-wrap: pretty; }
+.lede { font-size: clamp(19px, 2.4vw, 22px); line-height: 1.5; color: var(--ink); max-width: 46ch; letter-spacing: -.01em; }
+.muted { color: var(--muted); }
+.small { font-size: 13px; color: var(--muted); line-height: 1.55; }
+.sign { display: flex; flex-direction: column; gap: 2px; font-size: 15px; padding-top: 20px; border-top: 1px solid var(--line); align-self: flex-start; min-width: 240px; }
+.sign b { font-weight: 700; font-size: 17px; }
+
+/* logo chips */
+.parties { display: flex; flex-wrap: wrap; align-items: center; gap: 16px 20px; }
+.chip { display: flex; align-items: center; justify-content: center; background: var(--chip); border-radius: 16px; padding: 16px 24px; min-height: 72px; box-shadow: var(--shadow); }
+.chip svg { display: block; height: 30px; width: auto; max-width: 100%; }
+.chip .sym { height: 26px; fill: var(--chip-ink); }
+.chip .tiaa { height: 34px; }
+.plus, .arrow { color: var(--muted); font-size: 22px; line-height: 1; }
+.mariner { display: flex; flex-direction: column; gap: 4px; border: 2px solid var(--ink); border-radius: 16px; padding: 12px 24px; min-height: 72px; justify-content: center; }
+.mariner b { font-size: 24px; letter-spacing: -.025em; line-height: 1.1; }
+.mariner span { font-size: 10.5px; font-weight: 500; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); }
+
+/* facts */
+.facts { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 40px; border-top: 2px solid var(--rule); }
+.facts li { padding: 20px 0 22px; border-bottom: 1px solid var(--line); display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.facts .k { font-size: 10.5px; font-weight: 500; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); }
+.facts .v { font-size: 19px; font-weight: 500; line-height: 1.35; letter-spacing: -.01em; }
+.aside { background: var(--card); border-radius: 20px; padding: 20px 26px; max-width: none; }
+
+/* pressure points */
+.points { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 32px; }
+.point { display: flex; flex-direction: column; gap: 10px; padding-top: 16px; border-top: 2px solid var(--rule); min-width: 0; }
+.point p { font-size: 15.5px; color: var(--muted); }
+.flow { display: grid; grid-template-columns: minmax(0, 1fr) 44px minmax(0, 1fr) 44px minmax(0, 1fr); align-items: center; gap: 0; background: var(--card); border-radius: 24px; padding: 28px; }
+.flow .col { display: flex; flex-direction: column; gap: 8px; }
+.node { background: var(--surface); border-radius: 12px; padding: 12px 16px; font-size: 14.5px; line-height: 1.35; font-weight: 500; }
+.node.core { background: var(--ink); color: var(--bg); text-align: center; padding: 26px 18px; font-weight: 700; border-radius: 16px; }
+.node.out { border: 2px solid var(--green); text-align: center; padding: 24px 18px; font-weight: 700; border-radius: 16px; }
+.flow .arrow { text-align: center; }
+
+/* video placeholder */
+.video { display: flex; align-items: center; gap: 20px; border: 1.5px dashed var(--line); border-radius: 20px; padding: 20px 24px; max-width: 64ch; }
+.play { flex: none; width: 52px; height: 52px; border-radius: 50%; background: var(--green); position: relative; }
+.play::after { content: ""; position: absolute; left: 21px; top: 17px; border-left: 14px solid #22312C; border-top: 9px solid transparent; border-bottom: 9px solid transparent; }
+.video div { min-width: 0; }
+.video b { display: block; font-weight: 700; font-size: 15.5px; }
+.video span { font-size: 13.5px; color: var(--muted); display: block; margin-top: 2px; }
+
+/* questions */
+.qs { display: flex; flex-direction: column; border-top: 2px solid var(--rule); }
+.qs div { padding: 22px 0; border-bottom: 1px solid var(--line); font-size: clamp(20px, 3vw, 26px); font-weight: 500; letter-spacing: -.015em; line-height: 1.3; text-wrap: balance; }
+#qcap { margin-bottom: -16px; }
+.proof { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 32px; align-items: start; background: var(--card); border-radius: 24px; padding: 32px; }
+.proof[hidden] { display: none; }
+.proof .big { font-size: clamp(40px, 7vw, 60px); font-weight: 700; letter-spacing: -.035em; line-height: .95; font-variant-numeric: tabular-nums; padding-top: 16px; border-top: 4px solid var(--green); }
+.proof .big small { display: block; font-size: 10.5px; font-weight: 500; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); margin-top: 12px; }
+.proof p { font-size: 16.5px; }
+
+/* tabs */
+.tabs { display: flex; flex-direction: column; gap: 20px; }
+.tablist { display: flex; flex-wrap: wrap; gap: 8px; }
+.tablist button { font: inherit; font-size: 15px; font-weight: 500; color: var(--ink); background: transparent; border: 1.5px solid var(--line); border-radius: 999px; padding: 9px 20px; cursor: pointer; min-height: 44px; transition: border-color .2s var(--ease), background .2s var(--ease); }
+.tablist button:hover { border-color: var(--ink); }
+.tablist button[aria-selected="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.tablist button:focus-visible { outline: 2px solid var(--green); outline-offset: 3px; }
+.panel { display: flex; flex-direction: column; gap: 14px; padding: 32px 36px; background: var(--surface); border-radius: 24px; box-shadow: var(--shadow); max-width: 68ch; }
+.panel[hidden] { display: none; }
+.panel .k { font-size: 10.5px; font-weight: 500; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); }
+.panel h3 { font-size: 22px; }
+.panel p { font-size: 17.5px; }
+.stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px; }
+.stat { display: flex; flex-direction: column; gap: 8px; padding-top: 16px; border-top: 4px solid var(--green); }
+.stat b { font-size: 32px; letter-spacing: -.03em; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.stat span { font-size: 14.5px; color: var(--muted); }
+
+/* people + actions */
+.people { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px; max-width: 580px; }
+.person { display: flex; flex-direction: column; gap: 4px; padding-top: 16px; border-top: 2px solid var(--rule); }
+.person b { font-size: 19px; letter-spacing: -.015em; }
+.person span { font-size: 14.5px; color: var(--muted); }
+.actions { display: flex; flex-wrap: wrap; gap: 12px; }
+.btn { font: inherit; font-size: 16px; font-weight: 700; border-radius: 999px; padding: 13px 28px; min-height: 50px; cursor: pointer; border: 1.5px solid var(--ink); transition: transform .12s var(--ease), box-shadow .2s var(--ease), background .2s var(--ease); }
+.btn:active { transform: scale(.97); }
+.btn.primary { background: var(--btn-bg); color: var(--btn-ink); border-color: var(--btn-bg); box-shadow: var(--glow); }
+.btn.primary:hover { box-shadow: 0 10px 30px -6px rgba(95,216,163,.75); }
+.btn.ghost { background: transparent; color: var(--ink); }
+.btn.ghost:hover { background: var(--card); }
+.btn:focus-visible { outline: 2px solid var(--green); outline-offset: 3px; }
+.btn[disabled] { opacity: .3; cursor: default; box-shadow: none; }
+.btn[disabled]:active { transform: none; }
+.btn[hidden] { display: none; }
+.toast { min-height: 22px; font-size: 14px; color: var(--muted); }
+
+/* nav */
+.nav { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding-top: 28px; border-top: 1px solid var(--line); }
+.foot { font-size: 12px; color: var(--muted); display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 16px; }
+.step:not([hidden]) { animation: rise .32s var(--ease) both; }
+@keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .step:not([hidden]) { animation: none; } }
+
+/* choices */
+.choices { display: flex; flex-direction: column; gap: 36px; }
+.group { display: flex; flex-direction: column; gap: 14px; min-width: 0; padding-top: 20px; border-top: 1px solid var(--line); }
+.group h3 { font-size: clamp(18px, 2.6vw, 21px); }
+.opts { display: flex; flex-wrap: wrap; gap: 10px; }
+.opt { font: inherit; font-size: 15.5px; font-weight: 500; color: var(--ink); background: var(--surface); border: 1.5px solid var(--line); border-radius: 999px; padding: 10px 20px; min-height: 46px; cursor: pointer; text-align: left; transition: border-color .2s var(--ease), background .2s var(--ease); }
+.opt:hover { border-color: var(--ink); }
+.opt[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.opt[aria-pressed="true"]::before { content: ""; display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--green); margin-right: 10px; vertical-align: 1px; }
+.opt:focus-visible { outline: 2px solid var(--green); outline-offset: 3px; }
+.summary { background: var(--card); border-radius: 24px; padding: 28px 32px; max-width: 68ch; display: flex; flex-direction: column; gap: 14px; }
+.summary[hidden] { display: none; }
+.summary .k { font-size: 10.5px; font-weight: 500; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); }
+.summary ul { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 6px; font-size: 15.5px; font-weight: 500; }
+.summary li span { color: var(--muted); font-weight: 400; }
+.summary p { font-size: 16px; padding-top: 14px; border-top: 1px solid var(--line); }
+.summary p:empty { display: none; }
+
+.panel .eg { font-size: 15.5px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 16px; margin-top: 4px; }
+.panel .eg b { color: var(--ink); font-weight: 700; }
+
+@media (max-width: 680px) {
+  body { font-size: 16px; padding-block: 16px 40px; padding-left: max(20px, env(safe-area-inset-left, 0px)); padding-right: max(20px, env(safe-area-inset-right, 0px)); }
+  .wrap { gap: 32px; }
+  .bar { margin-top: -12px; }
+  main { padding-top: 12px; }
+  .step { gap: 28px; }
+  .brand img { height: 36px; }
+  .facts { grid-template-columns: minmax(0, 1fr); }
+  .points { grid-template-columns: minmax(0, 1fr); gap: 28px; }
+  .flow { grid-template-columns: minmax(0, 1fr); gap: 10px; padding: 20px; border-radius: 20px; }
+  .flow .arrow { transform: rotate(90deg); }
+  .proof { grid-template-columns: minmax(0, 1fr); gap: 20px; padding: 24px; border-radius: 20px; }
+  .panel { padding: 24px; border-radius: 20px; }
+  .summary { padding: 24px; border-radius: 20px; }
+  .video { padding: 16px 18px; gap: 16px; }
+  .stats, .people { grid-template-columns: minmax(0, 1fr); gap: 24px; }
+  .proto input { width: 100%; }
+  .chip, .mariner { min-height: 64px; padding: 12px 18px; }
+  .sign { min-width: 0; align-self: stretch; }
+}
+
+/* v2 additions */
+:root { --blue: #4A6BFA; }
+.btn:focus-visible, .tablist button:focus-visible, .opt:focus-visible, .bar button:focus-visible, .tick:focus-visible { outline-color: var(--blue); }
+.clients { display: flex; flex-direction: column; gap: 16px; padding-top: 8px; }
+.logos { display: grid; grid-template-columns: repeat(3, minmax(0, 168px)); gap: 12px; }
+.logo-slot { height: 72px; border-radius: 16px; background: var(--chip); box-shadow: var(--shadow); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; padding: 8px 12px; text-align: center; min-width: 0; }
+.logo-slot span { font-size: 14px; font-weight: 700; color: #22312C; line-height: 1.2; }
+.logo-slot small { font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: #6B746F; }
+.strap { font-size: 15.5px; color: var(--muted); max-width: 52ch; }
+.ticks { display: flex; flex-direction: column; gap: 10px; max-width: 640px; }
+.ticks .small { margin-bottom: 4px; }
+.tick { font: inherit; font-size: 17px; font-weight: 500; color: var(--ink); background: var(--surface); border: 1.5px solid var(--line); border-radius: 16px; padding: 16px 20px; min-height: 60px; display: flex; align-items: center; gap: 16px; text-align: left; cursor: pointer; line-height: 1.35; transition: border-color .2s var(--ease); }
+.tick:hover { border-color: var(--ink); }
+.tick:focus-visible { outline: 2px solid var(--blue); outline-offset: 3px; }
+.tick .box { flex: none; width: 24px; height: 24px; border-radius: 6px; border: 2px solid var(--ink); position: relative; transition: background .2s var(--ease), border-color .2s var(--ease); }
+.tick[aria-checked="true"] { border-color: var(--ink); }
+.tick[aria-checked="true"] .box { background: var(--green); border-color: var(--green); }
+.tick[aria-checked="true"] .box::after { content: ""; position: absolute; left: 6px; top: 1px; width: 7px; height: 13px; border: solid #22312C; border-width: 0 2.5px 2.5px 0; transform: rotate(45deg); }
+.opt-page { min-height: 58vh; }
+.examples { margin-top: auto; display: flex; flex-direction: column; gap: 12px; padding-top: 16px; }
+.ex { display: grid; grid-template-columns: 168px minmax(0, 1fr); gap: 24px; align-items: center; background: var(--card); border-radius: 20px; padding: 20px 24px; max-width: 760px; }
+.ex-logo { min-width: 0; }
+.ex-tt { height: 72px; display: flex; align-items: center; }
+.ex-tt img { height: 36px; width: auto; max-width: 100%; }
+.ex-tt .l { display: var(--logo-light-display); }
+.ex-tt .d { display: var(--logo-dark-display); }
+.ex-body { display: flex; flex-direction: column; gap: 6px; align-items: flex-start; min-width: 0; }
+.ex .k { font-size: 10.5px; font-weight: 500; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); }
+.ex p { font-size: 16.5px; font-weight: 500; line-height: 1.45; }
+.placeholder { color: var(--muted); font-style: italic; font-weight: 400; }
+.tbc { display: inline-block; padding: 3px 10px; border-radius: 999px; background: var(--coral); color: #22312C; font-size: 10.5px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; margin-top: 4px; }
+.summary ul { list-style: none; }
+@media (max-width: 680px) {
+  .logos { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+  .logo-slot { height: 64px; padding: 6px; }
+  .logo-slot span { font-size: 12px; }
+  .ex { grid-template-columns: minmax(0, 1fr); gap: 14px; padding: 18px 20px; }
+  .ex .logo-slot, .ex-tt { max-width: 168px; }
+  .opt-page { min-height: 0; }
+}
+
+.tips { list-style: none; margin: 0; padding: 0; counter-reset: tip; display: flex; flex-direction: column; border-top: 2px solid var(--rule); max-width: 760px; }
+.tips li { counter-increment: tip; display: grid; grid-template-columns: 44px minmax(0, 1fr); column-gap: 8px; row-gap: 4px; padding: 18px 0 20px; border-bottom: 1px solid var(--line); }
+.tips li::before { content: "0" counter(tip); grid-row: span 2; font-size: 13px; font-weight: 700; letter-spacing: .08em; color: var(--muted); padding-top: 3px; font-variant-numeric: tabular-nums; }
+.tips b { font-size: 18px; font-weight: 700; letter-spacing: -.015em; line-height: 1.3; }
+.tips span { font-size: 16px; color: var(--muted); line-height: 1.55; max-width: 58ch; }
+.ex-label { font-size: 10.5px; font-weight: 500; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); }
+.ex-stat { height: 72px; display: flex; flex-direction: column; justify-content: center; border-top: 4px solid var(--green); padding-top: 6px; }
+.ex-stat b { font-size: 28px; letter-spacing: -.03em; line-height: 1; font-variant-numeric: tabular-nums; }
+.ex-stat small { font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin-top: 6px; }
+.opt-page .lede { margin-bottom: -8px; }
+@media (max-width: 680px) { .tips li { grid-template-columns: 34px minmax(0, 1fr); } .tips b { font-size: 17px; } }
+</style>
+
+<div class="wrap">
+
+  <div class="proto" id="proto">
+    <strong>Prototype</strong>
+    <label for="nm">Recipient name</label>
+    <input id="nm" type="text" placeholder="[Name]" value="Dillon Lucas" autocomplete="off">
+  </div>
+
+  <header class="top">
+    <div class="brand" aria-label="Toucanberry Tech">
+      <img class="l" alt="Toucanberry Tech" src="logo-0.png">
+      <img class="d" alt="Toucanberry Tech" src="logo-1.png">
+    </div>
+    <div class="count" id="count" aria-live="polite">1 of 7</div>
+  </header>
+
+  <nav class="bar" id="bar" aria-label="Steps"></nav>
+
+  <main id="stage">
+
+    <!-- Welcome -->
+    <section class="step" data-id="welcome" data-title="Welcome">
+      <h1 tabindex="-1">Congratulations on the launch of Mariner Re, <span data-first>Dillon</span>.</h1>
+      <p class="lede">We've helped a few young reinsurers get set up, and learned a fair bit doing it. Here are the useful bits, in about three minutes.</p>
+      <div class="clients">
+        <div class="logos"><div class="logo-slot" role="img" aria-label="Resolution Re logo"><span>Resolution Re</span><small>Logo to add</small></div><div class="logo-slot" role="img" aria-label="InEvo Re logo"><span>InEvo Re</span><small>Logo to add</small></div><div class="logo-slot" role="img" aria-label="Prudential Financial logo"><span>Prudential Financial</span><small>Logo to add</small></div></div>
+        <p class="strap">We build the systems that let a reinsurer grow faster than its headcount.</p>
+      </div>
+      <div class="sign"><b>Laith Gharib</b><span class="muted">Managing Director, Toucanberry Tech</span></div>
+    </section>
+
+    <!-- Choose -->
+    <section class="step" data-id="choose" data-title="Pick a topic" hidden>
+      <h2 tabindex="-1">What would you like a look at?</h2>
+      <div class="ticks" role="group" aria-label="Topics">
+        <p class="small">Pick any. Each one opens a short page of what we've learned.</p>
+        <button type="button" class="tick" role="checkbox" aria-checked="false" data-v="foundations"><span class="box" aria-hidden="true"></span><span>Getting the data right from day one</span></button>
+        <button type="button" class="tick" role="checkbox" aria-checked="false" data-v="reporting"><span class="box" aria-hidden="true"></span><span>A faster, cleaner quarter-end</span></button>
+        <button type="button" class="tick" role="checkbox" aria-checked="false" data-v="data"><span class="box" aria-hidden="true"></span><span>Getting files in from cedants and asset managers</span></button>
+        <button type="button" class="tick" role="checkbox" aria-checked="false" data-v="ai"><span class="box" aria-hidden="true"></span><span>Where AI fits</span></button>
+      </div>
+    </section>
+
+    <section class="step opt-page" data-id="foundations" data-title="Data foundations" hidden>
+      <span class="label">Data foundations</span>
+      <h2 tabindex="-1">Build for book seven, not book one.</h2>
+      <p class="lede">Year one is the cheapest time to get this right. Three things we'd do early:</p>
+      <ol class="tips"><li><b>One place for the data.</b><span>Every file in one governed set, in one shape, so everyone works from the same version.</span></li><li><b>Connect what you've got.</b><span>Keep the actuarial, asset and reporting tools you've chosen, and join them up.</span></li><li><b>Start with one workflow.</b><span>Pick the one that hurts most. The same approach works for the rest.</span></li></ol>
+      <div class="examples"><span class="ex-label">Where we've done it</span><div class="ex"><div class="ex-logo"><div class="logo-slot" role="img" aria-label="Resolution Re logo"><span>Resolution Re</span><small>Logo to add</small></div></div><div class="ex-body"><p>From one book to seven in under four years, with a team of around 50. Manual work didn't grow with the book.</p></div></div></div>
+    </section>
+
+    <section class="step opt-page" data-id="reporting" data-title="Quarter-end" hidden>
+      <span class="label">Quarter-end</span>
+      <h2 tabindex="-1">Make quarter-end a list of things to decide, not things to find.</h2>
+      <p class="lede">At one firm we audited, about 40% of actuarial hours went on moving and fixing data. Most of that can go:</p>
+      <ol class="tips"><li><b>Check automatically, all the way through.</b><span>Run the controls when data arrives and again after the valuation, not once at the start.</span></li><li><b>Fix it once, at source.</b><span>A correction should flow through to every report that uses it.</span></li><li><b>Give every exception an owner.</b><span>Each one gets a status and a record, so nothing goes missing before sign-off.</span></li></ol>
+      <div class="examples"><span class="ex-label">Where we've done it</span><div class="ex"><div class="ex-logo"><div class="ex-stat"><b>15+ to 3</b><small>working days</small></div></div><div class="ex-body"><p>Core quarter-end close at one Bermuda reinsurer we work with.</p></div></div><div class="ex"><div class="ex-logo"><div class="logo-slot" role="img" aria-label="Prudential Financial logo"><span>Prudential Financial</span><small>Logo to add</small></div></div><div class="ex-body"><p>Matt Koen at BILTIR: the time used to go on preparing data, then reconciling the output. His actuaries now spend it on analysis.</p><span class="tbc">Attribution TBC, pending sign-off</span></div></div></div>
+    </section>
+
+    <section class="step opt-page" data-id="data" data-title="Cedant and asset data" hidden>
+      <span class="label">Cedant and asset data</span>
+      <h2 tabindex="-1">If a file changed shape tomorrow, how long before anyone noticed?</h2>
+      <p class="lede">At one client, a format change corrupted downstream reports for months before anyone spotted it. It's easy to prevent if you set it up early:</p>
+      <ol class="tips"><li><b>One secure route in.</b><span>Cedants and asset managers send files the same way, instead of by email.</span></li><li><b>Check every file on arrival.</b><span>Compare it with what it should look like, and flag anything odd before it reaches a report.</span></li><li><b>Track every file.</b><span>From due to processed, so you know what's late and who owns it.</span></li></ol>
+      <div class="examples"><span class="ex-label">Where we've done it</span><div class="ex"><div class="ex-logo"><div class="logo-slot" role="img" aria-label="Resolution Re logo"><span>Resolution Re</span><small>Logo to add</small></div></div><div class="ex-body"><p>Over 7,000 files now flow through the secure exchange, with same-day processing for routine submissions.</p></div></div><div class="ex"><div class="ex-logo"><div class="logo-slot" role="img" aria-label="InEvo Re logo"><span>InEvo Re</span><small>Logo to add</small></div></div><div class="ex-body"><p><span class="placeholder">[One line on the partner data exchange, TBC]</span></p><span class="tbc">TBC</span></div></div></div>
+    </section>
+
+    <section class="step opt-page" data-id="ai" data-title="AI" hidden>
+      <span class="label">AI</span>
+      <h2 tabindex="-1">AI is only as good as the data you point it at.</h2>
+      <p class="lede">The models are already good enough. What makes the difference is what sits around them:</p>
+      <ol class="tips"><li><b>Give it a job description.</b><span>Build an agent like a specialist: a defined role, your business rules, approved data and tools, and human sign-off.</span></li><li><b>Ask in plain English.</b><span>With governed data underneath, "What drove the change in capital requirements for FY25, gross versus net?" gets an answer in minutes.</span></li><li><b>Keep a record.</b><span>The BMA's consultation expects firms to reconstruct how a material decision was reached. It's far easier to build that in from the start.</span></li></ol>
+      <div class="examples"><span class="ex-label">What we've shown</span><div class="ex"><div class="ex-logo"><div class="ex-tt"><img class="l" alt="Toucanberry Tech" src="logo-0.png"><img class="d" alt="Toucanberry Tech" src="logo-1.png"></div></div><div class="ex-body"><p>At BILTIR we showed BSCR questions answered from governed data, and control checks proposed for a new treaty's seriatim file.</p></div></div><div class="ex"><div class="ex-logo"><div class="logo-slot" role="img" aria-label="Resolution Re logo"><span>Resolution Re</span><small>Logo to add</small></div></div><div class="ex-body"><p>Nick Bailey, Resolution's Bermuda CEO, at BILTIR: treat AI like an intern, with clear instructions, the right data, and someone checking its work.</p><span class="tbc">Attribution TBC, pending sign-off</span></div></div></div>
+    </section>
+
+    <!-- Parked: not in the journey. To restore, add 'understand' before 'next' in buildPath(). -->
+    <section class="step" data-id="understand" data-title="What we understand" hidden>
+      <span class="label">What we know</span>
+      <h2 tabindex="-1">Mariner Re, as we understand it.</h2>
+      <div class="parties" aria-label="Launched by Symetra and TIAA">
+        <div class="chip"><svg class="sym" viewBox="0 0 209 36.6" role="img" aria-label="Symetra" xmlns="http://www.w3.org/2000/svg"><path d="M4.6 6.7S28.5.7 37.2.6C46.6.5 50.3 1.9 52.1 6c1.4 3.2-1.6 6.1-1.6 6.1s5.5 1.3 8.5 3.7c2.1 1.6 2.2 3.6 2.2 3.6s1.5 1.3 1.8 1.7c0 0-3-.5-4.1-.6C42.6 17.7 18 17.8.7 36.1-.4 37.3.6 35 5.4 28.9 18 12.5 38.5 11.7 38.5 11.7s-.9-3.1-10-4.3c-5.8-.7-23.9-.7-23.9-.7"></path><path d="M67.4 35.3h-.9v-5.8h1.3c.6 0 1.1 0 1.4.3.4.3.6.7.6 1.3 0 .9-.5 1.5-1.3 1.6l2 2.6h-1.1l-1.9-2.6h-.1v2.6zm.3-3.4c.8 0 1.2-.1 1.2-.8 0-.7-.4-.9-1.2-.9h-.2v1.7h.2zM72.4 29.4h3.2v.8h-2.3v1.5h2.3v.8h-2.3v1.9h2.3v.8h-3.2v-5.8zM80.2 35.3h-.9v-5h-1.5v-.8h4v.8h-1.5v5zM84 29.4h1v5.8h-1v-5.8zM88.9 35.3H88v-5.8h1.3c.6 0 1.1 0 1.4.3.4.3.6.7.6 1.3 0 .9-.5 1.5-1.3 1.6l2 2.6h-1.1L89 32.7h-.1v2.6zm.2-3.4c.8 0 1.2-.1 1.2-.8 0-.7-.4-.9-1.2-.9H89v1.7h.1zM94 29.4h3.2v.8h-2.3v1.5h2.3v.8h-2.3v1.9h2.3v.8H94v-5.8zM104.6 31.6c0 .3-.1.5-.3.8l-1.5 3.1-1.5-3.2c-.1-.2-.2-.5-.3-.7 0 .3 0 .5-.1.8l-.6 2.9h-.9l1.4-6 1.7 3.7c0 .1.2.4.3.8.1-.3.2-.6.3-.8l1.7-3.7 1.4 6h-.9l-.6-2.9c0-.1 0-.4-.1-.8zM108.3 29.4h3.2v.8h-2.3v1.5h2.3v.8h-2.3v1.9h2.3v.8h-3.2v-5.8zM114.3 29.2l3.7 3.6c.2.2.4.5.6.7v-4h.9v6l-3.8-3.6-.6-.6v4h-.9v-6.1zM124.2 35.3h-.9v-5h-1.5v-.8h4v.8h-1.5v5zM130.9 36.4h-.5v-8.1h.5v8.1zM136.4 29.4h1.5c.6 0 1.1 0 1.4.3.4.3.6.7.6 1.2 0 .6-.3 1-.8 1.2.7.1 1.1.7 1.1 1.4 0 .5-.2.9-.5 1.2-.4.4-1 .4-1.8.4h-1.5v-5.7zm1.3 2.5c.9 0 1.2-.2 1.2-.8 0-.7-.4-.9-1.2-.9h-.4v1.7h.4zm0 2.6c.5 0 .9 0 1.1-.2.2-.2.4-.4.4-.7 0-.4-.2-.7-.4-.8-.2-.1-.5-.1-.8-.1h-.6v1.9h.3zM142.6 29.4h3.2v.8h-2.3v1.5h2.3v.8h-2.3v1.9h2.3v.8h-3.2v-5.8zM148.5 29.2l3.7 3.6c.2.2.4.5.6.7v-4h.9v6l-3.8-3.6-.6-.6v4h-.9v-6.1zM156.5 29.4h3.2v.8h-2.3v1.5h2.3v.8h-2.3v1.9h2.3v.8h-3.2v-5.8zM162.6 29.4h3.2v.8h-2.3v1.4h2.3v.8h-2.3v2.7h-.9v-5.7zM168.2 29.4h.9v5.8h-.9v-5.8zM173.8 35.3h-.9v-5h-1.5v-.8h4v.8h-1.5v5zM177.7 33.7c.1.5.5.8 1.1.8.6 0 .9-.3.9-.9 0-.6-.4-.7-1-1-1-.5-1.6-.9-1.6-1.8s.7-1.6 1.8-1.6c.9 0 1.5.3 1.7 1l-.7.4c-.2-.4-.5-.5-.9-.5-.5 0-.8.3-.8.7 0 .6.5.7 1.1 1 1 .5 1.5.9 1.5 1.7 0 1.1-.7 1.8-1.9 1.8-1 0-1.6-.5-1.8-1.3l.6-.3zM185.9 36.4h-.5v-8.1h.5v8.1zM191.5 29.4h.9v5h2.1v.8h-3.1v-5.8zM196.7 29.4h.9v5.8h-.9v-5.8zM200.3 29.4h3.2v.8h-2.3v1.4h2.3v.8h-2.3v2.7h-.9v-5.7zM205.4 29.4h3.2v.8h-2.3v1.5h2.3v.8h-2.3v1.9h2.3v.8h-3.2v-5.8z"></path><path d="M68.9 15.3c.4 1.7 1.7 2.6 3.6 2.6 1.8 0 3-1.1 3-2.8 0-1.8-1.4-2.3-3.3-3.2-3.4-1.7-5.2-3-5.2-5.8 0-3 2.2-5.2 5.7-5.2C75.5.9 77.4 2 78.1 4l-2.4 1.2C75 4 74.1 3.5 72.9 3.5c-1.7 0-2.7.9-2.7 2.4 0 1.8 1.5 2.4 3.6 3.3 3.3 1.5 4.9 2.9 4.9 5.6 0 3.5-2.3 5.8-6.2 5.8-3.2 0-5.3-1.5-6-4.3l2.4-1zM90.4 11.6L84 1.3h3.2l3.9 6.4c.1.1.4.6.8 1.5.2-.6.5-1.1.8-1.6l4.1-6.3h3.1l-6.5 10.2v8.6h-3v-8.5zM121 8.3c-.2.9-.4 1.7-.9 2.6l-4.9 10-4.9-10.2c-.4-.8-.7-1.6-.9-2.4 0 .9-.2 1.8-.3 2.6l-2 9.3h-2.8L108.7.6l5.6 11.8c.2.3.5 1.2 1 2.6.4-1.1.8-1.9 1.1-2.6L121.8.6l4.6 19.6h-2.8l-2.1-9.3c-.2-.4-.3-1.2-.5-2.6zM134.9 1.3h10.5V4H138v4.7h7.5v2.7H138v6.1h7.5v2.7H135V1.3zM161.5 20.2h-3.1V4h-5V1.3h13V4h-5v16.2zM176.3 20.2h-2.9V1.3h4.3c2 0 3.5.2 4.7 1.1 1.1.9 1.8 2.4 1.8 4.1 0 3-1.5 4.7-4.3 5.1l6.5 8.6H183l-6.3-8.4h-.3v8.4zm.7-10.8c2.7 0 4-.3 4-2.6 0-2.3-1.3-2.8-4-2.8h-.6v5.4h.6zM203.3 15.3h-7.4l-2.2 4.8h-3.2L199.6.5l9.1 19.6h-3.2l-2.2-4.8zm-1.1-2.5l-1.9-4.3c-.2-.5-.4-1.2-.7-2.1-.2.9-.5 1.6-.7 2.1l-1.9 4.3h5.2z"></path></svg></div>
+        <span class="plus" aria-hidden="true">+</span>
+        <div class="chip"><svg class="tiaa" viewBox="0 0 160 41" fill="none" role="img" aria-label="TIAA" xmlns="http://www.w3.org/2000/svg"><path d="M50.0029 3.95115V10.1984H61.0869V40.1995H68.0895V10.1984H79.1735V3.95115H50.0071H50.0029ZM82.149 3.95115V40.1995H89.1558V3.95115H82.149ZM108.327 16.333L112.033 25.3596H104.597L108.327 16.333ZM106.863 3.46706L91.4176 40.2036H98.4661L102.151 31.2855H114.433L118.159 40.2036H125.371L109.926 3.46289H106.863V3.46706ZM142.272 16.333L145.978 25.3596H138.541L142.272 16.333ZM140.807 3.46706L125.362 40.2036H132.407L136.092 31.2855H148.373L152.1 40.2036H159.311L143.87 3.46289H140.807V3.46706Z" fill="#041459"/><path d="M39.9999 0.199219H30.001V10.1982H39.9999V0.199219Z" fill="#041459"/><path d="M19.9938 0.199219C14.4727 0.199219 9.99902 4.67705 9.99902 10.1982H30.0011V0.199219H19.9938Z" fill="#305AF3"/><path d="M39.9999 20.2046C39.9999 25.7257 35.5221 30.1994 30.001 30.1994V20.2046V10.1973H39.9999V20.2046Z" fill="#00AD97"/><path d="M30.001 30.2004H29.5921H20.0063H9.99895V10.1983C9.99895 7.43563 11.1174 4.9359 12.9244 3.12891L2.92958 13.1237C1.11841 14.9349 0 17.4346 0 20.1931V40.1993H20.0063C22.7689 40.1993 25.2686 39.0809 27.0756 37.2656L37.0704 27.2708C35.2593 29.0778 32.7595 30.1962 30.001 30.1962V30.2004Z" fill="#041459"/></svg></div>
+        <span class="arrow" aria-hidden="true">&rarr;</span>
+        <div class="mariner"><b>Mariner Re</b><span>Bermuda, Class E</span></div>
+      </div>
+      <ul class="facts">
+        <li><span class="k">Arrangement</span><span class="v">Flow reinsurance of Symetra annuities, effective 1 October 2026</span></li>
+        <li><span class="k">Capital</span><span class="v">$750 million equity investment from TIAA</span></li>
+        <li><span class="k">Investment management</span><span class="v">Two managers: Symetra Investment Management and Nuveen</span></li>
+        <li><span class="k">Purpose</span><span class="v">Committed growth capital for Symetra's annuity business</span></li>
+      </ul>
+      <p class="aside">Symetra launched Symetra Bermuda Re in 2022.</p>
+      <p class="small">Sources: Symetra and TIAA announcement, 26 October 2026. Reinsurance News, December 2022.</p>
+    </section>
+
+    <!-- Next -->
+    <section class="step" data-id="next" data-title="If it's useful" hidden>
+      <span class="label">If it's useful</span>
+      <h2 tabindex="-1">Want to dig into any of this?</h2>
+      <p class="lede">Forty-five minutes with Laith and Sanjay on whatever you picked. Nothing to prepare.</p>
+      <div class="summary" id="summary" hidden><span class="k">You picked</span><ul id="sumlist"></ul></div>
+      <div class="people">
+        <div class="person"><b>Laith Gharib</b><span>Managing Director</span></div>
+        <div class="person"><b>Sanjay Khosla</b><span>Principal Consultant</span></div>
+      </div>
+      <div class="actions">
+        <button class="btn primary" data-cta="In the live version this opens a booking calendar.">Book a time</button>
+        <button class="btn ghost" data-cta="In the live version this lets you share the page with a colleague.">Send this to a colleague</button>
+      </div>
+      <div class="toast" id="toast" role="status"></div>
+    </section>
+
+  </main>
+
+  <div class="nav">
+    <button class="btn ghost" id="back">Back</button>
+    <button class="btn primary" id="next">Next</button>
+  </div>
+
+  <div class="foot"><span>Toucanberry Tech</span><span>Logos shown belong to their owners and appear for identification only.</span></div>
+
+</div>
+
+<script>
+(function () {
+  var all = {};
+  Array.prototype.forEach.call(document.querySelectorAll('.step'), function (s) { all[s.getAttribute('data-id')] = s; });
+  var bar = document.getElementById('bar'), count = document.getElementById('count');
+  var back = document.getElementById('back'), next = document.getElementById('next');
+  var nm = document.getElementById('nm'), toast = document.getElementById('toast');
+  var summary = document.getElementById('summary'), sumlist = document.getElementById('sumlist');
+  var OPTS = ['foundations', 'reporting', 'data', 'ai'];
+  var labels = {};
+  var ticked = [];
+  var path = [], cur = 0;
+
+  function buildPath() {
+    path = ['welcome', 'choose'].concat(ticked.length ? ticked : OPTS, ['next']);
+  }
+  function renderBar() {
+    bar.innerHTML = '';
+    path.forEach(function (id) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.setAttribute('aria-label', 'Step: ' + all[id].getAttribute('data-title'));
+      b.addEventListener('click', function () { show(id, true); });
+      bar.appendChild(b);
+    });
+  }
+  function meta() {
+    Array.prototype.forEach.call(bar.children, function (b, k) {
+      if (k === cur) b.setAttribute('aria-current', 'step'); else b.removeAttribute('aria-current');
+      b.className = k < cur ? 'done' : '';
+    });
+    count.textContent = (cur + 1) + ' of ' + path.length;
+    back.disabled = cur === 0;
+    next.hidden = cur === path.length - 1;
+    next.textContent = path[cur] === 'choose' ? 'Show me' : 'Next';
+  }
+  function personalise() {
+    sumlist.innerHTML = '';
+    ticked.forEach(function (v) { var li = document.createElement('li'); li.textContent = labels[v]; sumlist.appendChild(li); });
+    summary.hidden = !ticked.length;
+  }
+  function show(id, focus) {
+    var i = path.indexOf(id); if (i < 0) i = 0;
+    cur = i; id = path[i];
+    Object.keys(all).forEach(function (k) { all[k].hidden = k !== id; });
+    personalise(); meta();
+    toast.textContent = '';
+    try { history.replaceState(null, '', '#' + id); } catch (e) { location.hash = id; }
+    window.scrollTo(0, 0);
+    if (focus) { var hd = all[id].querySelector('h1,h2'); if (hd) hd.focus({ preventScroll: true }); }
+  }
+  back.addEventListener('click', function () { show(path[cur - 1], true); });
+  next.addEventListener('click', function () { show(path[cur + 1], true); });
+  document.addEventListener('keydown', function (e) {
+    var t = e.target && e.target.tagName;
+    if (t === 'INPUT' || t === 'TEXTAREA') return;
+    if (e.key === 'ArrowRight' && cur < path.length - 1) show(path[cur + 1], true);
+    if (e.key === 'ArrowLeft' && cur > 0) show(path[cur - 1], true);
+  });
+  window.addEventListener('hashchange', function () {
+    var id = location.hash.slice(1);
+    if (path.indexOf(id) >= 0 && path[cur] !== id) show(id, false);
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('.tick'), function (b) {
+    var v = b.getAttribute('data-v');
+    labels[v] = b.textContent.trim();
+    b.addEventListener('click', function () {
+      var k = ticked.indexOf(v);
+      if (k >= 0) ticked.splice(k, 1); else ticked.push(v);
+      b.setAttribute('aria-checked', k >= 0 ? 'false' : 'true');
+      buildPath(); renderBar();
+      cur = path.indexOf('choose');
+      personalise(); meta();
+    });
+  });
+  function applyName() {
+    var v = nm.value.trim() || '[Name]', f = v.split(/\s+/)[0];
+    Array.prototype.forEach.call(document.querySelectorAll('[data-name]'), function (n) { n.textContent = v; });
+    Array.prototype.forEach.call(document.querySelectorAll('[data-first]'), function (n) { n.textContent = f; });
+  }
+  nm.addEventListener('input', applyName); applyName();
+  Array.prototype.forEach.call(document.querySelectorAll('[data-cta]'), function (b) {
+    b.addEventListener('click', function () { toast.textContent = b.getAttribute('data-cta'); });
+  });
+  buildPath(); renderBar();
+  var start = location.hash.slice(1);
+  show(path.indexOf(start) >= 0 ? start : 'welcome', false);
+})();
+</script>
